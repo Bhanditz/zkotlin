@@ -1,11 +1,6 @@
-package br.com.zup.zkotlin
+package br.com.zup.zkotlin.either
 
-interface IEither<out L, out R> {
-    fun isLeft(): Boolean
-    fun isRight(): Boolean
-    operator fun component1(): L?
-    operator fun component2(): R?
-}
+import java.util.*
 
 sealed class Either<out L, out R> : IEither<L, R> {
 
@@ -17,16 +12,30 @@ sealed class Either<out L, out R> : IEither<L, R> {
         fun <R> right(right: R): Right<Nothing, R> = Right(right)
     }
 
+    fun <T> fold(applyLeft: (L) -> T, applyRight: (R) -> T): T = when (this) {
+        is Left -> applyLeft(component1())
+        is Right -> applyRight(component2())
+    }
 
-    fun <X> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
-        is Left -> fl(left)
-        is Right -> fr(right)
+    inline fun <T> success(onSuccess: (R) -> T) = onSuccess(get())
+
+    inline fun <T> failure(onFail: (L) -> T) = onFail(failure())
+
+    fun get(): R = when (this) {
+        is Right -> this.component2()
+        else -> throw NoSuchElementException(this.toString())
+    }
+
+    fun failure(): L = when (this) {
+        is Left -> this.component1()
+        else -> throw NoSuchElementException(this.toString())
     }
 
 }
 
 
-class Left<out L, out R>(val left: L) : Either<L, R>() {
+
+class Left<out L, out R>(private val left: L) : Either<L, R>() {
     override fun isLeft() = true
 
     override fun isRight() = false
@@ -49,9 +58,11 @@ class Left<out L, out R>(val left: L) : Either<L, R>() {
     }
 
     override fun hashCode(): Int = left?.hashCode() ?: 0
+
 }
 
-class Right<out L, out R>(val right: R) : Either<L, R>() {
+
+class Right<out L, out R>(private val right: R) : Either<L, R>() {
     override fun isLeft() = false
 
     override fun isRight() = true

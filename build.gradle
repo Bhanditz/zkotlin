@@ -1,6 +1,9 @@
 buildscript {
-    ext.kotlin_version = '1.2.30'
-    ext.kotlinx_coroutines = '0.22.5'
+    ext {
+        kotlin_version = '1.2.30'
+        kotlinx_coroutines = '0.22.5'
+        junit_version = '4.12'
+    }
 
     repositories {
         mavenCentral()
@@ -23,6 +26,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines"
+    testCompile "junit:junit:$junit_version"
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 }
 
@@ -31,4 +35,14 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
