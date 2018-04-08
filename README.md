@@ -3,7 +3,7 @@
 
 Extensions for Kotlin Language
 
-- Either<L, R>
+- Either<L, R> - [Examples](src/test/kotlin/br/com/zup/zkotlin/either/EitherTest.kt)
     - Either.Left<L,R> Either.Right<L,R>
         - Either.right<Int, String>("right value)
         - Either.left<Int, String>(-1)
@@ -22,6 +22,5 @@ Extensions for Kotlin Language
     - fun <TL, TR> foldCompose(left: (L) -> Either<TL, TR>, right: (R) -> Either<TL, TR>): Either<TL, TR>
     - fun getOrElse(supplier: (L) -> Either<L, R>): Either<L, R>
     
-    - [Examples](src/test/kotlin/br/com/zup/zkotlin/either/EitherTest.kt)
     
 
