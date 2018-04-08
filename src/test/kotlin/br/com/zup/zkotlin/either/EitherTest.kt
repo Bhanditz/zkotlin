@@ -11,13 +11,13 @@ class EitherTest {
 
     @Test
     fun `should get value from Right`() {
-        val either = Either.right<Exception, String>("this is rightOf")
+        val either = Either.right<Exception, String>("this is right value")
 
         assertTrue { either.isRight() }
         assertFalse { either.isLeft() }
         assertEquals(null, either.component1())
-        assertEquals("this is rightOf", either.component2())
-        assertEquals("this is rightOf", either.get())
+        assertEquals("this is right value", either.component2())
+        assertEquals("this is right value", either.get())
     }
 
     @Test
@@ -38,9 +38,9 @@ class EitherTest {
         assertEquals(null, lComponent2)
 
 
-        val (rComponent1, rComponent2) = Either.rightOf("this is rightOf")
+        val (rComponent1, rComponent2) = Either.rightOf("this is right value")
         assertEquals(null, rComponent1)
-        assertEquals("this is rightOf", rComponent2)
+        assertEquals("this is right value", rComponent2)
     }
 
     @Test
