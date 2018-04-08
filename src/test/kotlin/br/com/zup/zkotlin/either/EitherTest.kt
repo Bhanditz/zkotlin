@@ -1,5 +1,6 @@
 package br.com.zup.zkotlin.either
 
+import br.com.zup.zkotlin.extensions.isEven
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -10,41 +11,41 @@ class EitherTest {
 
     @Test
     fun `should get value from Right`() {
-        val either = Either.right("this is right")
+        val either = Either.right<Exception, String>("this is rightOf")
 
         assertTrue { either.isRight() }
         assertFalse { either.isLeft() }
         assertEquals(null, either.component1())
-        assertEquals("this is right", either.component2())
-        assertEquals("this is right", either.get())
+        assertEquals("this is rightOf", either.component2())
+        assertEquals("this is rightOf", either.get())
     }
 
     @Test
     fun `should get value from Left`() {
-        val either = Either.left(-1)
+        val either = Either.left<FailureException, String>(FailureException(-1))
 
         assertTrue { either.isLeft() }
         assertFalse { either.isRight() }
-        assertEquals(-1, either.component1())
+        assertEquals(-1, either.component1().code)
         assertEquals(null, either.component2())
-        assertEquals(-1, either.failure())
+        assertEquals(-1, either.failure().code)
     }
 
     @Test
-    fun `should deconstruct`() {
-        val (lComponent1, lComponent2) = Either.left(-1)
+    fun `should deconstruct with component1() and component2()`() {
+        val (lComponent1, lComponent2) = Either.leftOf(-1)
         assertEquals(-1, lComponent1)
         assertEquals(null, lComponent2)
 
 
-        val (rComponent1, rComponent2) = Either.right("this is right")
+        val (rComponent1, rComponent2) = Either.rightOf("this is rightOf")
         assertEquals(null, rComponent1)
-        assertEquals("this is right", rComponent2)
+        assertEquals("this is rightOf", rComponent2)
     }
 
     @Test
     fun `should get value from failure() and exception from get() if is Left`() {
-        val either = Either.left(-1)
+        val either = Either.leftOf(-1)
         assertEquals(-1, either.failure())
 
         assertFailsWith<NoSuchElementException> {
@@ -54,8 +55,8 @@ class EitherTest {
 
     @Test
     fun `should get value from get() and exception from failure() if is Right`() {
-        val either = Either.right("right value")
-        assertEquals("right value", either.get())
+        val either = Either.rightOf("rightOf value")
+        assertEquals("rightOf value", either.get())
 
         assertFailsWith<NoSuchElementException> {
             either.failure()
@@ -63,8 +64,8 @@ class EitherTest {
     }
 
     @Test
-    fun `should only execute the lambda function for success operation`() {
-        val either = Either.right("right value")
+    fun `should only execute the lambda function for success if is Right`() {
+        val either = Either.rightOf("right value")
 
         val rightValue = either.success {
             assertEquals("right value", it)
@@ -79,8 +80,8 @@ class EitherTest {
     }
 
     @Test
-    fun `should only execute the lambda function for failure operation`() {
-        val either = Either.left(-1)
+    fun `should only execute the lambda function for failure if is Left`() {
+        val either = Either.leftOf(-1)
 
         val leftValue = either.failure {
             assertEquals(-1, it)
@@ -95,8 +96,8 @@ class EitherTest {
     }
 
     @Test
-    fun `should fold right and double it`() {
-        val either = Either.right(2)
+    fun `should fold and execute only the right lambda if is Right`() {
+        val either = Either.rightOf(2)
 
         val result = either.fold(
                 { -1 }, { it + it })
@@ -105,13 +106,83 @@ class EitherTest {
     }
 
     @Test
-    fun `should fold left and return the exception message`() {
-        val either = Either.left(NoSuchElementException("error"))
+    fun `should fold and execute only the left lambda if is Left`() {
+        val either = Either.leftOf(NoSuchElementException("error"))
 
         val result = either.fold(
-                { it.message  }, { "not executed" })
+                { it.message }, { "not executed" })
 
         assertEquals("error", result)
     }
 
+
+    @Test
+    fun `should ping-pong left and right with foldCompose()`() {
+
+        assertTrue {
+            processEvenOrFailIfIsOdd(0)
+                    .foldCompose(::recoveryIfCodeIsEvenOrFailAgain, ::processEvenOrFailIfIsOdd)
+                    .foldCompose(::recoveryIfCodeIsEvenOrFailAgain, ::processEvenOrFailIfIsOdd)
+                    .fold({ false }, { true })
+        }
+        assertFalse {
+            processEvenOrFailIfIsOdd(0)
+                    .foldCompose(::recoveryIfCodeIsEvenOrFailAgain, ::processEvenOrFailIfIsOdd)
+                    .foldCompose(::recoveryIfCodeIsEvenOrFailAgain, ::processEvenOrFailIfIsOdd)
+                    .foldCompose(::recoveryIfCodeIsEvenOrFailAgain, ::processEvenOrFailIfIsOdd)
+                    .fold({ false }, { true })
+        }
+
+    }
+
+    @Test
+    fun `should call getOrElse until the last operation`() {
+
+        assertEquals(2,
+                     processEvenOrFailIfIsOdd(1)
+                             .getOrElse { processEvenOrFailIfIsOdd(1) }
+                             .getOrElse { processEvenOrFailIfIsOdd(1) }
+                             .getOrElse {  Either.right(2) }
+                             .get() )
+
+
+    }
+
+    @Test
+    fun `should call getOrElse only once`() {
+
+        assertEquals(2,
+                     processEvenOrFailIfIsOdd(1)
+                             .getOrElse {  Either.right(2) }
+                             .getOrElse { processEvenOrFailIfIsOdd(1) }
+                             .getOrElse { processEvenOrFailIfIsOdd(1) }
+                             .get() )
+
+    }
+
+
+}
+
+
+class FailureException(val code: Int) : RuntimeException("some error code: $code")
+
+
+fun processEvenOrFailIfIsOdd(code: Int): Either<FailureException, Int> {
+    return if (code.isEven()) {
+        Either.right<FailureException, Int>(code.inc())
+                .also { println("code: $code. I'm good, keep going") }
+    } else {
+        Either.left<FailureException, Int>(FailureException(code.inc()))
+                .also { println("code: $code. I'm not good, I'm going to fail") }
+    }
+}
+
+fun recoveryIfCodeIsEvenOrFailAgain(e: FailureException): Either<FailureException, Int> {
+    return if (e.code.isEven()) {
+        Either.right<FailureException, Int>(e.code.inc())
+                .also { println("code ${e.code}. I'm good now, keep going") }
+    } else {
+        Either.left<FailureException, Int>(FailureException(e.code.inc()))
+                .also { println("code ${e.code}. I'm not good, I'm going to fail") }
+    }
 }

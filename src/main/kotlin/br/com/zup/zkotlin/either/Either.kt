@@ -2,24 +2,25 @@ package br.com.zup.zkotlin.either
 
 import java.util.*
 
-sealed class Either<out L, out R> : IEither<L, R> {
+sealed class Either<L, R> : IEither<L, R> {
 
     companion object {
         @JvmStatic
-        fun <L> left(left: L): Left<L, Nothing> = Left(left)
+        fun <L, R> left(left: L) = Left<L, R>(left)
 
         @JvmStatic
-        fun <R> right(right: R): Right<Nothing, R> = Right(right)
+        fun <L> leftOf(left: L): Left<L, Nothing> = Left(left)
+
+        @JvmStatic
+        fun <L, R> right(right: R) = Right<L, R>(right)
+
+        @JvmStatic
+        fun <R> rightOf(right: R): Right<Nothing, R> = Right(right)
     }
 
-    fun <T> fold(applyLeft: (L) -> T, applyRight: (R) -> T): T = when (this) {
-        is Left -> applyLeft(component1())
-        is Right -> applyRight(component2())
-    }
+    fun <T> success(onSuccess: (R) -> T): T = onSuccess(get())
 
-    inline fun <T> success(onSuccess: (R) -> T) = onSuccess(get())
-
-    inline fun <T> failure(onFail: (L) -> T) = onFail(failure())
+    fun <T> failure(onFail: (L) -> T): T = onFail(failure())
 
     fun get(): R = when (this) {
         is Right -> this.component2()
@@ -31,11 +32,25 @@ sealed class Either<out L, out R> : IEither<L, R> {
         else -> throw NoSuchElementException(this.toString())
     }
 
+    fun <T> fold(left: (L) -> T, right: (R) -> T): T = when (this) {
+        is Left -> left(component1())
+        is Right -> right(component2())
+    }
+
+    fun <TL, TR> foldCompose(left: (L) -> Either<TL, TR>,
+                             right: (R) -> Either<TL, TR>): Either<TL, TR> = when (this) {
+        is Left -> left(this.component1())
+        is Right -> right(this.component2())
+    }
+
+    fun getOrElse(supplier: (L) -> Either<L, R>): Either<L, R> = when (this) {
+        is Left -> supplier(this.component1())
+        is Right -> this
+    }
 }
 
 
-
-class Left<out L, out R>(private val left: L) : Either<L, R>() {
+class Left<L, R>(private val left: L) : Either<L, R>() {
     override fun isLeft() = true
 
     override fun isRight() = false
@@ -62,7 +77,7 @@ class Left<out L, out R>(private val left: L) : Either<L, R>() {
 }
 
 
-class Right<out L, out R>(private val right: R) : Either<L, R>() {
+class Right<L, R>(private val right: R) : Either<L, R>() {
     override fun isLeft() = false
 
     override fun isRight() = true
