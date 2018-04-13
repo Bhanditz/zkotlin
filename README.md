@@ -23,5 +23,9 @@ Extensions for Kotlin Language
     - fun <TR> andThen(supplier: (R) -> Either<L, TR>): Either<L, TR>
     - fun getOrElse(supplier: (L) -> Either<L, R>): Either<L, R>
     
+- Int - [Examples](src/test/kotlin/br/com/zup/zkotlin/extensions/IntTest.kt)
+    - fun isEven(): Boolean    
+    - fun isOdd(): Boolean    
+
     
 
