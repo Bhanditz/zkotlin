@@ -142,8 +142,8 @@ class EitherTest {
                      processEvenOrFailIfIsOdd(1)
                              .getOrElse { processEvenOrFailIfIsOdd(1) }
                              .getOrElse { processEvenOrFailIfIsOdd(1) }
-                             .getOrElse {  Either.right(2) }
-                             .get() )
+                             .getOrElse { Either.right(2) }
+                             .get())
 
 
     }
@@ -153,11 +153,34 @@ class EitherTest {
 
         assertEquals(2,
                      processEvenOrFailIfIsOdd(1)
-                             .getOrElse {  Either.right(2) }
+                             .getOrElse { Either.right(2) }
                              .getOrElse { processEvenOrFailIfIsOdd(1) }
                              .getOrElse { processEvenOrFailIfIsOdd(1) }
-                             .get() )
+                             .get())
 
+    }
+
+    @Test
+    fun `should call andThen until last one`() {
+        assertEquals("my double value transformed to string 9.0",
+                     processEvenOrFailIfIsOdd(2)
+                             .andThen { Either.right<FailureException, Double>(it.toDouble() * it) }
+                             .andThen { Either.right<FailureException, String>("my double value transformed to string $it") }
+                             .get())
+    }
+
+    @Test
+    fun `should fail on second call and not call the next andThen`() {
+
+        processEvenOrFailIfIsOdd(2)
+                .andThen { processEvenOrFailIfIsOdd(it) }
+                .andThen { Either.right<FailureException, String>("i was not called because last one fail") }
+                .andThen { Either.right<FailureException, String>("i was not called because last one fail") }
+                .andThen { Either.right<FailureException, String>("i was not called because last one fail") }
+                .andThen { Either.right<FailureException, String>("i was not called because last one fail") }
+                .failure {
+                    assertEquals(4, it.code)
+                }
     }
 
 

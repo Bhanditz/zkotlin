@@ -43,6 +43,11 @@ sealed class Either<L, R> : IEither<L, R> {
         is Right -> right(this.component2())
     }
 
+    fun <TR> andThen(supplier: (R) -> Either<L, TR>): Either<L, TR> = when (this) {
+        is Left -> Left(this.component1())
+        is Right -> supplier(this.component2())
+    }
+
     fun getOrElse(supplier: (L) -> Either<L, R>): Either<L, R> = when (this) {
         is Left -> supplier(this.component1())
         is Right -> this

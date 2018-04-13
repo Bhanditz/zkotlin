@@ -20,6 +20,7 @@ Extensions for Kotlin Language
     - fun <T> failure(onFail: (L) -> T): T
     - fun <T> fold(left: (L) -> T, right: (R) -> T): T
     - fun <TL, TR> foldCompose(left: (L) -> Either<TL, TR>, right: (R) -> Either<TL, TR>): Either<TL, TR>
+    - fun <TR> andThen(supplier: (R) -> Either<L, TR>): Either<L, TR>
     - fun getOrElse(supplier: (L) -> Either<L, R>): Either<L, R>
     
     
