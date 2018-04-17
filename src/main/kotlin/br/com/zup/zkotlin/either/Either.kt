@@ -18,6 +18,9 @@ sealed class Either<L, R> : IEither<L, R> {
         fun <R> rightOf(right: R): Right<Nothing, R> = Right(right)
     }
 
+    override fun isLeft(): Boolean = this is Left
+    override fun isRight(): Boolean = this is Right
+
     fun <T> success(onSuccess: (R) -> T): T = onSuccess(get())
 
     fun <T> failure(onFail: (L) -> T): T = onFail(failure())
@@ -56,10 +59,6 @@ sealed class Either<L, R> : IEither<L, R> {
 
 
 class Left<L, R>(private val left: L) : Either<L, R>() {
-    override fun isLeft() = true
-
-    override fun isRight() = false
-
     override fun component1(): L = this.left
 
     override fun component2(): R? = null
@@ -83,10 +82,6 @@ class Left<L, R>(private val left: L) : Either<L, R>() {
 
 
 class Right<L, R>(private val right: R) : Either<L, R>() {
-    override fun isLeft() = false
-
-    override fun isRight() = true
-
     override fun component1(): L? = null
 
     override fun component2(): R = right

@@ -5,9 +5,9 @@ Extensions for Kotlin Language
 
 - Either<L, R> - [Examples](src/test/kotlin/br/com/zup/zkotlin/either/EitherTest.kt)
     - Either.Left<L,R> Either.Right<L,R>
-        - Either.right<Int, String>("right value)
+        - Either.right<Int, String>("right value")
         - Either.left<Int, String>(-1)
-        - Either.rightOf("right value)
+        - Either.rightOf("right value")
         - Either.leftOf(-1)
 
     - fun isRight(): Boolean
