@@ -73,6 +73,12 @@ signing {
     sign configurations.archives
 }
 
+release {
+    git {
+        pushToBranchPrefix = 'release-'
+    }
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
