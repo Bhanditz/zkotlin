@@ -13,7 +13,7 @@ buildscript {
 }
 
 group "br.com.zup.kotlin"
-archivesBaseName = "zkotlin"
+archivesBaseName "zkotlin"
 version "1.0.1-SNAPSHOT"
 
 
