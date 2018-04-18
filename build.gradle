@@ -6,29 +6,21 @@ buildscript {
     }
     repositories {
         mavenCentral()
-        maven {
-            url 'http://maven.tmatesoft.com/content/repositories/releases/'
-        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'au.com.ish.gradle:release:2.2.2'
     }
 }
 
+plugins {
+    id 'net.researchgate.release' version '2.6.0'
+}
 
 apply plugin: 'kotlin'
 apply plugin: 'maven'
 apply plugin: 'signing'
-apply plugin: 'release'
 
-release {
-    failOnSnapshotDependencies = true
-    allowLocalModifications = false
-    releaseDryRun = false
-    scm = 'git'
-}
-version = release.projectVersion
+version = "1.0.1-SNAPSHOT"
 group = "br.com.zup.kotlin"
 
 repositories {
