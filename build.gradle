@@ -20,9 +20,6 @@ apply plugin: 'kotlin'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-version = "1.0.1-SNAPSHOT"
-group = "br.com.zup.kotlin"
-
 repositories {
     mavenCentral()
 }
@@ -73,9 +70,13 @@ signing {
     sign configurations.archives
 }
 
+afterReleaseBuild {
+    dependsOn uploadArchives
+}
+
 release {
     git {
-        pushToBranchPrefix = 'release-'
+        requireBranch = 'release'
     }
 }
 
