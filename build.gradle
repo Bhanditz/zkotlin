@@ -12,10 +12,8 @@ buildscript {
     }
 }
 
-group "br.com.zup.kotlin"
-archivesBaseName "zkotlin"
-version "1.0.1-SNAPSHOT"
-
+group = "br.com.zup.kotlin"
+version = "1.0.1-SNAPSHOT"
 
 apply plugin: 'kotlin'
 apply plugin: 'maven'
@@ -64,7 +62,7 @@ task sourcesJar(type: Jar) {
 }
 
 artifacts {
-    archives javadocJar, sourcesJar
+    archives jar, javadocJar, sourcesJar
 }
 
 signing {
@@ -108,7 +106,6 @@ uploadArchives {
                     developer {
                         id 'mikematsumoto'
                         name 'Mike S  Matsumoto'
-                        email 'mike.matsumoto@zup.com.br'
                     }
                 }
             }
