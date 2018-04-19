@@ -1,5 +1,7 @@
 # zkotlin
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/br.com.zup.kotlin/zkotlin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/br.com.zup.kotlin/zkotlin)
+
 
 Extensions for Kotlin Language
 
