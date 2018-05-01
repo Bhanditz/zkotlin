@@ -25,6 +25,20 @@ Extensions for Kotlin Language
     - fun <TR> andThen(supplier: (R) -> Either<L, TR>): Either<L, TR>
     - fun getOrElse(supplier: (L) -> Either<L, R>): Either<L, R>
     
+- List<Either<L, R>> - [Examples](src/test/kotlin/br/com/zup/zkotlin/either/EitherListTest.kt)
+    - fun <L, R, T> List<Either<L, R>>.fold(onError: (L) -> Unit, onSuccess: (R) -> T): List<T>
+    - fun <L, R> List<Either<L, R>>.foldSuccess(): List<R>
+    - fun <L, R, T> List<Either<L, R>>.foldSuccess(onSuccess: (R) -> T): List<T>
+    - fun <L, R> List<Either<L, R>>.foldError(onError: (L) -> Unit): List<Either<L, R>>
+    
+- Coroutine List - [Examples](src/test/kotlin/br/com/zup/zkotlin/coroutine/CoroutineListTest.kt)
+    - suspend fun <T> List<Deferred<T>>.await()    
+    
+- Currying - [Examples](src/test/kotlin/br/com/zup/zkotlin/currying/CurryingTest.kt)
+    - ::foobar(a,b).curried()
+    - ::foobar(a,b,c).curried()
+    - *max of 5 parameters foobar(a,b,c,d,e)*
+    
 - Int - [Examples](src/test/kotlin/br/com/zup/zkotlin/extensions/IntTest.kt)
     - fun isEven(): Boolean    
     - fun isOdd(): Boolean    
