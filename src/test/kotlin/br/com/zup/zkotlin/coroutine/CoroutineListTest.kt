@@ -17,7 +17,7 @@ class CoroutineListTest {
                     .await()
         }
 
-        assertEquals((1..10).map { it * 2}, doubleList)
+        assertEquals((1..10).map { it * 2 }, doubleList)
 
     }
 
@@ -25,7 +25,7 @@ class CoroutineListTest {
         println("starting $x")
         delay(200, MILLISECONDS)
         println("done $x")
-         x * 2
+        x * 2
     }
 
 }

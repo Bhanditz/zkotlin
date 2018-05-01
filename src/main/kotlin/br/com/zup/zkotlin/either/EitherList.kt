@@ -3,7 +3,7 @@ package br.com.zup.zkotlin.either
 
 inline fun <L, R, T> List<Either<L, R>>.fold(onError: (L) -> Unit, onSuccess: (R) -> T): List<T> =
         foldError(onError)
-        .run { foldSuccess(onSuccess) }
+                .run { foldSuccess(onSuccess) }
 
 inline fun <L, R> List<Either<L, R>>.foldError(onError: (L) -> Unit): List<Either<L, R>> {
     this.filter { it.isLeft() }
